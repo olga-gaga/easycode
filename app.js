@@ -1,232 +1,154 @@
-(function(){
-    //task 1
-    console.log('task 1'); 
-    
-    let car = { 
-        name: 'Lexus', 
-        age: 10, 
-        lastService: '7 month',
-        create: 2008, 
-        needRepair: false 
-    };
+//task 1
+console.log('task 1');
 
-    if(parseFloat(car.lastService) > 5) {
-        car.needRepair = true;
-        console.log('Need Repair');
-    }
+(function (){
 
-    //task 2
-    console.log('task 2'); 
-
-    let product = {
-        name: 'Яблоко',
-        price: '10$'
-    };
-    
-    let min = 10; // минимальная цена
-    let max = 20; // максимальная цена
-    let prodPrice =parseFloat(product.price);
-
-    if( !isNaN(prodPrice) && prodPrice >= min && prodPrice <= max){
-        console.log(product.name);
-    } 
-    else {
-        console.log('Товар не найден');
-    }
-
-    //task 3
-    console.log('task 3'); 
-
-    const string = 'JavaScript is a pretty good language';
-    let resultString = '';
-
-    for(let item of string.split(' ')) {
-        resultString += `${item[0].toUpperCase()}${item.slice(1)}`;
-    }
-    console.log(`${string} => ${resultString}`);
-
-    //task 4
-    console.log('task 4'); 
-
-    function doubleArray(array){
-        if(!Array.isArray(array)) return 'Что-то пошло не так.';
-        return array.concat(array);
-    }
-
-    console.log([1, 2, 3], '=>', doubleArray([1, 2, 3]));
-
-    //task 5 
-    console.log('task 5'); 
-
-    function deleteFirst(){
-        let resultArray = [];
-        for (let array of arguments){
-            if(Array.isArray(array)){ 
-                array.shift();
-                resultArray.push(array);
-            }
-        }
-        return resultArray;
-    }
-
-    console.log(deleteFirst([1, 2, 3], ['a', 'b', 'c']));
-    console.log(deleteFirst([1, 2, 3]));
-
-    //task 6
-    console.log('task 6'); 
+    const map = ["_id", "name", "isActive", "balance"];
 
     const users = [
-        {
-            "_id": "5d1c3860aa841704d3245513",
-            "isActive": false,
-            "balance": 2764.35,
-            "age": 33,
-            "name": "Allie Blair",
-            "gender": "female",
-            "company": "PHOTOBIN",
-            "email": "allieblair@photobin.com",
-            "phone": "+1 (951) 566-2987",
-            "registered": "2018-11-30T02:29:00 -02:00"
-        },
-        {
-            "_id": "5d1c386095ffb689687f2db9",
-            "isActive": false,
-            "balance": 3276.25,
-            "age": 22,
-            "name": "Yesenia Leblanc",
-            "gender": "female",
-            "company": "SKINSERVE",
-            "email": "yesenialeblanc@skinserve.com",
-            "phone": "+1 (947) 446-2840",
-            "registered": "2015-10-31T01:10:31 -02:00"
-        },
-        {
-            "_id": "5d1c3860e73ff2a338722e81",
-            "isActive": true,
-            "balance": 1868.65,
-            "age": 38,
-            "name": "Mamie Kramer",
-            "gender": "female",
-            "company": "EARBANG",
-            "email": "mamiekramer@earbang.com",
-            "phone": "+1 (885) 564-3305",
-            "registered": "2014-06-03T09:36:40 -03:00"
-        },
-        {
-            "_id": "5d1c386000e4f2fc62be1b1e",
-            "isActive": true,
-            "balance": 1003.15,
-            "age": 32,
-            "name": "Crawford Bryant",
-            "gender": "male",
-            "company": "DIGIRANG",
-            "email": "crawfordbryant@digirang.com",
-            "phone": "+1 (889) 408-2141",
-            "registered": "2015-01-15T05:20:21 -02:00"
-        },
-        {
-            "_id": "5d1c386008ff236a315d638b",
-            "isActive": false,
-            "balance": 3045.41,
-            "age": 36,
-            "name": "Helene Holland",
-            "gender": "female",
-            "company": "HYDROCOM",
-            "email": "heleneholland@hydrocom.com",
-            "phone": "+1 (937) 554-2040",
-            "registered": "2014-09-15T08:22:59 -03:00"
-        },
-        {
-            "_id": "5d1c3860b4c27c4d5fdb6c1f",
-            "isActive": true,
-            "balance": 1693.51,
-            "age": 23,
-            "name": "Hernandez Osborn",
-            "gender": "male",
-            "company": "TERRASYS",
-            "email": "hernandezosborn@terrasys.com",
-            "phone": "+1 (965) 595-3942",
-            "registered": "2016-08-06T12:19:01 -03:00"
-        }
+    {
+        "_id": "5d220b10e8265cc978e2586b",
+        "isActive": true,
+        "balance": 2853.33,
+        "age": 20,
+        "name": "Buckner Osborne",
+        "gender": "male",
+        "company": "EMPIRICA",
+        "email": "bucknerosborne@empirica.com",
+        "phone": "+1 (850) 411-2997",
+        "registered": "2018-08-13T04:28:45 -03:00"
+    },
+    {
+        "_id": "5d220b10144ef972f6c2b332",
+        "isActive": true,
+        "balance": 1464.63,
+        "age": 38,
+        "name": "Rosalie Smith",
+        "gender": "female",
+        "company": "KATAKANA",
+        "email": "rosaliesmith@katakana.com",
+        "phone": "+1 (943) 463-2496",
+        "registered": "2016-12-09T05:15:34 -02:00"
+    },
+    {
+        "_id": "5d220b1083a0494655cdecf6",
+        "isActive": false,
+        "balance": 2823.39,
+        "age": 40,
+        "name": "Estrada Davenport",
+        "gender": "male",
+        "company": "EBIDCO",
+        "email": "estradadavenport@ebidco.com",
+        "phone": "+1 (890) 461-2088",
+        "registered": "2016-03-04T03:36:38 -02:00"
+    }
     ];
 
-    function getUsers(usersArray, field, value) {
-        if(!Array.isArray(usersArray) && typeof field === 'string') return 'Что-то пошло не так.';
-        let resultArray = [];
-        for(let user of usersArray) {
-            if(user.hasOwnProperty(field) && user[field] === value) resultArray.push(user);
+    const mapUsers = users.map(user => 
+        map.reduce((acc, key) => {
+            if (Object.keys(user).indexOf(key) !== -1) {
+                acc[key] = user[key];
+            }
+            return acc;
+        }, {}));
+
+    console.log(mapUsers);
+
+})();
+//task 2
+console.log('task 2');
+
+(function() {
+
+    const charWithIndex = [{char:"a",index:12}, {char:"w",index:8}, {char:"Y",index:10}, {char:"p",index:3}, {char:"p",index:2}, {char:"N",index:6}, {char:" ",index:5}, {char:"y",index:4}, {char:"r",index:13}, {char:"H",index:0}, {char:"e",index:11}, {char:"a",index:1}, {char:" ",index:9}, {char:"!",index:14}, {char:"e",index:7}];
+
+    function createStr(arrayOfChars){
+        if(Array.isArray(arrayOfChars)){
+            return [...arrayOfChars]
+                .sort((prevIndex, nextIndex) => prevIndex.index - nextIndex.index)
+                .reduce((acc, char) => (acc += char.char), '');
         }
-        return resultArray;
+        else console.log('Ошибочное значение');
     }
 
-    console.log(getUsers(users, 'gender', 'male'));
-    console.log(getUsers(users, 'isActive', true));
-    console.log(getUsers(users, null, true));
-    
-    //task 7
-    console.log('task 7'); 
+    const resultStr = createStr(charWithIndex);
 
-    const obj = {};
+    console.log(resultStr);
 
-    (function(x) {
-        x.b = 1;
-        x = null;
-    })(obj);
-    
-    console.log('obj = ', obj);
-
-    let obj1 = {};
-
-    obj1 = (function(x) {
-        x.b = 1;
-        x = null;
-        return x;
-    })(obj);
-
-    console.log('obj1 = ', obj1);
-
-    //task 8
-    console.log('task 8'); 
-
-    const price = {
-        price: 10,
-        discount: '15%',
-        getPrice() {
-            return this.price;
-        }, 
-        getPriceWithDiscount(){
-            return this.price * (1 - parseFloat(this.discount)  / 100);
-        }
-      };
-      
-      console.log('price:', price.getPrice()); // 10
-      console.log('price with discount:', price.getPriceWithDiscount()); // 8.5
-
-      //task 9 
-      console.log('task 9'); 
-
-      let sizes = { width: 5, height: 10 },
-      getSquare = function () { return this.width * this.height };
-
-      console.log(getSquare.call(sizes));
-      
-      //every
-      console.log('Задание по функциям высшего порядка');
-      
-      function every(numArray, callback){
-          if (!Array.isArray(numArray) || typeof callback !== 'function') return 'Что-то пошло не так';
-          for(let i = 0; i < numArray.length; i++) {
-              if (!callback(numArray[i], i, numArray)) return false;
-            }
-            return true;
-        }
-        
-        function checkNumber(number, index, array) {
-            if (array[index] === number && number > 5) return true;
-            return false; 
-        }
-
-        console.log(every([5, 7, 8 , 9], checkNumber));
-        console.log(every([10, 7, 8 , 9], checkNumber));
-        console.log(every([10, 7, 3 , 9], checkNumber));
 })();
+
+//task 3
+console.log('task 3');
+
+(function() {
+    
+    function getInfo ({name = 'Unknown', info: {partners: [partner1, partner2] = []} = {}} = {}){
+        console.log(`Name: ${name} \nPartners: ${partner1}, ${partner2}`);
+    }
+
+    const organisation = { 
+        name: 'Google', 
+        info: { 
+          employees: ['Vlad', 'Olga'], 
+          partners: ['Microsoft', 'Facebook', 'Xing'] 
+      } };
+
+    getInfo(organisation);
+
+})();
+
+//task 4
+console.log('task 4');
+
+(function() {  
+
+    const person = {
+        name: 'Denis',
+        age: 30,
+        lastGet: '',
+        lastUpdate: '', 
+        get nameField(){
+            this.lastGet = Date(Date.now());
+            console.log(this.name);
+        }, 
+        set nameField (newName) {
+            this.lastUpdate = Date(Date.now());
+            if(typeof newName === 'string') this.name = newName;
+            else console.log('Ошибочное значение');
+        }
+    };
+    console.log(person);
+    person.nameField;
+    console.log(person);
+    person.nameField = 'Olga';
+    console.log(person);
+})();
+
+//task 5
+console.log('task 5');
+
+(function() {
+    
+    const product = {
+        brand: 'Apple',
+        model: 'iPhone 7',
+        price: '$300', 
+        get info() {
+            return `${this.brand} ${this.model}`;
+        },
+        set info(value) {
+            if(typeof value === 'string') {
+                [this.brand, ...model] = value.split(' ');
+                this.model = model.join(' ');
+            }
+            else console.log('Ошибочное значение');
+        },
+    };
+    console.log(product);
+    console.log(product.info);
+    product.info = 'Samsung S8 Gold';
+    console.log(product);
+    console.log(product.info);
+
+})();
+

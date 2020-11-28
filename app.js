@@ -242,7 +242,7 @@ const tasks = [
     const li =  target.closest('li');
     const span = li.firstChild;
     changeCompleteTaskHtml(complited, li, span, target);
-    if (sortTask === 'not_completed') setTimeout(deleteTaskFromHtml, 500, true, li);
+    if (sortTask === 'incomplete') setTimeout(deleteTaskFromHtml, 500, true, li);
   }
 
   function deleteTask(id) {
@@ -270,14 +270,14 @@ const tasks = [
       title.classList.add('text-success');
       button.classList.add('btn-warning');
       button.classList.remove('btn-success');
-      button.textContent = 'Not completed';
+      button.textContent = 'Incomplete';
     }
     else{
       item.classList.remove('bg-light');
       title.classList.remove('text-success');
       button.classList.add('btn-success');
       button.classList.remove('btn-warning');
-      button.textContent = 'Completed';
+      button.textContent = 'Complete';
     }
   }
 
@@ -292,13 +292,13 @@ const tasks = [
     if (sortTask === 'all') renderAllTasks(tasksList);
     else {
       //объект только с выполненными задачами
-      notCompletedTasksList = Object.values(tasksList)
+      incompleteTasksList = Object.values(tasksList)
         .reduce ((acc, task) => {
           if ( !task.completed ) acc[task._id] = task; 
           return acc;
         }, {});
       
-      renderAllTasks(notCompletedTasksList);
+      renderAllTasks(incompleteTasksList);
     }
     return;
   }

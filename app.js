@@ -38,7 +38,6 @@ const tasks = [
     acc[task._id] = task;
     return acc;
   }, {});
-  console.log(objOfTasks);
 
   const themes = {
     default: {
@@ -243,7 +242,7 @@ const tasks = [
     const li =  target.closest('li');
     const span = li.firstChild;
     changeCompleteTaskHtml(complited, li, span, target);
-    if (sortTask === 'completed') setTimeout(deleteTaskFromHtml, 500, true, li);
+    if (sortTask === 'not_completed') setTimeout(deleteTaskFromHtml, 500, true, li);
   }
 
   function deleteTask(id) {
@@ -261,7 +260,6 @@ const tasks = [
 
   function completeTask(id){
     objOfTasks[id].completed = objOfTasks[id].completed ? false : true;
-    console.log(objOfTasks[id].completed);
     return objOfTasks[id].completed;
   }
 
@@ -294,13 +292,13 @@ const tasks = [
     if (sortTask === 'all') renderAllTasks(tasksList);
     else {
       //объект только с выполненными задачами
-      completedTasksList = Object.values(tasksList)
+      notCompletedTasksList = Object.values(tasksList)
         .reduce ((acc, task) => {
-          if ( task.completed ) acc[task._id] = task; 
+          if ( !task.completed ) acc[task._id] = task; 
           return acc;
         }, {});
       
-      renderAllTasks(completedTasksList);
+      renderAllTasks(notCompletedTasksList);
     }
     return;
   }

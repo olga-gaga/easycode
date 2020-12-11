@@ -71,4 +71,10 @@ body {
   border-color: var(--input-focus-border-color);
   box-shadow: var(--input-focus-box-shadow);
 }
+.span-title {
+  font-weight: bold;
+}
 
+.color{
+  color: black;
+}

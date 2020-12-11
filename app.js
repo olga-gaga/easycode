@@ -34,6 +34,7 @@ const tasks = [
 ];
 
 (function(arrOfTasks) {
+
   const objOfTasks = arrOfTasks.reduce((acc, task) => {
     acc[task._id] = task;
     return acc;
@@ -106,7 +107,24 @@ const tasks = [
     },
   };
 
-  let lastSelectedTheme = 'default';
+  const listItemStyle = {
+    classes: {
+      li: 'list-group-item d-flex align-items-center flex-wrap mt-2',
+      button_complete: 'complete-btn btn ml-auto col-sm offset-md-3',
+      getLiClasses(completed) {
+        return `${this.li} ${completed? 'bg-light text-success' : ''}`;
+      },
+      getCompleteButtonClasses(completed) {
+        return `${this.button_complete} ${completed ? 'btn-warning' : 'btn-success'}`;
+      }
+    },
+    buttonText: {
+      true: 'Incomplete',
+      false: 'Complete',
+    }
+  };
+
+  let lastSelectedTheme = localStorage.getItem('app_theme') || 'default';
   let sortTask = 'all';
 
   // Elemnts UI
@@ -120,6 +138,7 @@ const tasks = [
   const sortTasksSelect = document.querySelector('.sort');
 
   // Events
+  setTheme(lastSelectedTheme);
   renderAllTasks(objOfTasks);
   form.addEventListener('submit', onFormSubmitHandler);
   listContainer.addEventListener('click', onButtonLiHandler);
@@ -136,15 +155,18 @@ const tasks = [
       renderEmptyListMessage();
       return;
     }
+    listContainer.insertAdjacentHTML('beforeend', createTasksListFragment(tasksList));
+  }
 
-    const fragment = document.createDocumentFragment();
+  function createTasksListFragment(tasksList){
+    let fragment = '';
     Object.values(tasksList)
     .sort( (prevValue, nextValue) => prevValue.completed - nextValue.completed)
     .forEach(task => {
       const li = listItemTemplate(task);
-      fragment.appendChild(li);
+      fragment += li;
     });
-    listContainer.appendChild(fragment);
+    return fragment;
   }
 
   function renderEmptyListMessage(){
@@ -155,78 +177,66 @@ const tasks = [
   }
 
   function listItemTemplate({ _id, title, body, completed } = {}) {
-    const li = document.createElement('li');
-    li.classList.add(
-      'list-group-item',
-      'd-flex',
-      'align-items-center',
-      'flex-wrap',
-      'mt-2',
-    );
-    li.setAttribute('data-task-id', _id);
-
-    const span = document.createElement('span');
-    span.textContent = title;
-    span.style.fontWeight = 'bold';
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Delete task';
-    deleteBtn.classList.add('btn', 'btn-danger', 'col-sm', 'offset-md-3', 'delete-btn');
-
-    const completeBtn = document.createElement('button'); //кнопка выполнения
-    completeBtn.classList.add('btn', 'ml-auto', 'col-sm', 'offset-md-3', 'complete-btn');
-    changeCompleteTaskHtml(completed, li, span,completeBtn); 
-
-    const div = document.createElement('div');
-    div.classList.add('buttons', 'row', 'col-md-8', 'ml-auto');
-    div.appendChild(completeBtn);
-    div.appendChild(deleteBtn);
-
-    const article = document.createElement('p');
-    article.textContent = body;
-    article.classList.add('mt-2', 'w-100');
-
-    li.appendChild(span);
-    li.appendChild(div);
-    li.appendChild(article);
-    return li;
+    return `
+    <li class="${listItemStyle.classes.getLiClasses(completed)}" data-task-id="${_id}"> 
+      <span class="span-title"> ${title} </span>
+      <div class="buttons row col-md-8 ml-auto">
+        <button class="${listItemStyle.classes.getCompleteButtonClasses(completed)}">${listItemStyle.buttonText[completed]}</button>
+        <button class="delete-btn btn btn-danger col-sm offset-md-3"> Delete task </button>
+      </div>
+      <p class="mt-2 w-100 color"> ${body} </p>
+    </li>`;
   }
 
   function onFormSubmitHandler(e) {
     e.preventDefault();
-    const titleValue = inputTitle.value;
-    const bodyValue = inputBody.value;
+    const {title: titleValue, body:bodyValue} = getNewTaskText();
 
+    createNewTask(titleValue, bodyValue);
+
+    form.reset();
+  }
+
+  function createNewTask(titleValue, bodyValue){
     if (!titleValue || !bodyValue) {
       alert('Пожалуйста введите title и body');
       return;
     }
-
-    const task = createNewTask(titleValue, bodyValue);
+    const task = createNewTaskField(titleValue, bodyValue);
     const listItem = listItemTemplate(task);
-    listContainer.insertAdjacentElement('afterbegin', listItem);
-    form.reset();
+    listContainer.insertAdjacentHTML('afterbegin', listItem);
   }
 
-  function createNewTask(title, body) {
+  function getNewTaskText(){
+    return {
+      title: inputTitle.value,
+      body: inputBody.value,
+    };
+  }
+
+
+  function createNewTaskField(title, body) {
     const newTask = {
       title,
       body,
       completed: false,
       _id: `task-${Math.random()}`,
     };
-
     objOfTasks[newTask._id] = newTask;
 
     return { ...newTask };
   }
 
   function onButtonLiHandler({target}) {
-    if(target.tagName = 'BUTTON') {
+    if(target.tagName === 'BUTTON') {
       const parent = target.closest('[data-task-id]');
       const id = parent.dataset.taskId;
-      if(target.classList.contains('delete-btn')) onDeleteHandler(id, parent);
-      else if (target.classList.contains('complete-btn')) onCompleteHandler(id, target);
+      if(target.classList.contains('delete-btn')) {
+        onDeleteHandler(id, parent);
+      }
+      else if (target.classList.contains('complete-btn')) {
+        onCompleteHandler(id, target);
+      }
   
     }
   }
@@ -234,15 +244,19 @@ const tasks = [
   function onDeleteHandler(id, parent) {
     const confirmed = deleteTask(id);
     deleteTaskFromHtml(confirmed, parent);
-    if (Object.values(objOfTasks).length === 0) renderEmptyListMessage(); //вывод сообщения, что список задач пуст
+    if (Object.values(objOfTasks).length === 0) {
+      renderEmptyListMessage(); //вывод сообщения, что список задач пуст
+    }
   }
 
   function onCompleteHandler(id, target) {
     const complited = completeTask(id); //изменяет поле complited 
     const li =  target.closest('li');
-    const span = li.firstChild;
-    changeCompleteTaskHtml(complited, li, span, target);
-    if (sortTask === 'incomplete') setTimeout(deleteTaskFromHtml, 500, true, li);
+    console.dir(li);
+    changeCompleteTaskHtml(li, target, complited);
+    if (sortTask === 'incomplete') {
+      setTimeout(deleteTaskFromHtml, 500, true, li);
+    }
   }
 
   function deleteTask(id) {
@@ -259,26 +273,15 @@ const tasks = [
   }
 
   function completeTask(id){
-    objOfTasks[id].completed = objOfTasks[id].completed ? false : true;
+    objOfTasks[id].completed = !objOfTasks[id].completed;
     return objOfTasks[id].completed;
   }
 
   //изменяет вид и содержимое кнопки в зависимости от статуса задачи
-  function changeCompleteTaskHtml(completed, item, title, button){ 
-    if (completed) {
-      item.classList.add('bg-light');
-      title.classList.add('text-success');
-      button.classList.add('btn-warning');
-      button.classList.remove('btn-success');
-      button.textContent = 'Incomplete';
-    }
-    else{
-      item.classList.remove('bg-light');
-      title.classList.remove('text-success');
-      button.classList.add('btn-success');
-      button.classList.remove('btn-warning');
-      button.textContent = 'Complete';
-    }
+  function changeCompleteTaskHtml(item, button, completed){ 
+    item.classList = listItemStyle.classes.getLiClasses(completed);
+    button.classList = listItemStyle.classes.getCompleteButtonClasses(completed);
+    button.textContent = listItemStyle.buttonText[completed];
   }
 
   //изменяет вид кнопки сортировки
@@ -289,7 +292,9 @@ const tasks = [
 
   function renderSortTaskList(sortTask, tasksList){
     listContainer.innerHTML = '';
-    if (sortTask === 'all') renderAllTasks(tasksList);
+    if (sortTask === 'all') {
+      renderAllTasks(tasksList);
+    }
     else {
       //объект только с выполненными задачами
       incompleteTasksList = Object.values(tasksList)
@@ -300,7 +305,6 @@ const tasks = [
       
       renderAllTasks(incompleteTasksList);
     }
-    return;
   }
 
   function onSortSelectHandler ({target}){
@@ -319,6 +323,7 @@ const tasks = [
     }
     setTheme(selectedTheme);
     lastSelectedTheme = selectedTheme;
+    localStorage.setItem('app_theme', selectedTheme);
   }
 
   function setTheme (name) {

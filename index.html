@@ -4,68 +4,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <!-- Compiled and minified CSS -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
     <link
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
     />
-    <link rel="stylesheet" href="styles.css" />
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <nav class="header navbar navbar-dark bg-primary">
-      <a class="navbar-brand">Navbar</a>
-      <form class="form-inline">
-        <select class="form-control form-control-sm" id="themeSelect">
-          <option value="default">Theme Default</option>
-          <option value="light">Theme Light</option>
-          <option value="dark">Theme Dark</option>
-        </select>
-      </form>
+    <nav class="blue lighten-2">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo">News App</a>
+      </div>
     </nav>
-
-    <div class="sort mt-3 mx-auto">
-     <button class='btn btn-primary sort-btn' value='all'> All tasks</button>
-     <button class='btn btn-secondary sort-btn' value='incomplete'> Incomplete tasks</button>
-    </div>
-    <div class="form-section mt-5">
+    <div class="search-controls">
       <div class="container">
         <div class="row">
-          <div class="col col-8 mx-auto">
+          <div class="col s12 m6">
             <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Add new task</h5>
-                <form name="addTask">
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    class="form-control"
-                    placeholder="Task title"
-                  />
-                  <input
-                    type="text"
-                    name="body"
-                    id="body"
-                    class="form-control mt-3"
-                    placeholder="Task body"
-                  />
-                  <button type="submit" class="btn btn-primary mt-4">
-                    Add task
+              <form name="newsControls">
+                <div class="card-content">
+                  <span class="card-title">Search news</span>
+                  <div class="input-field">
+                    <select name="country" id="country">
+                      <option value="ua">Ukraine</option>
+                      <option value="us">United States</option>
+                    </select>
+                    <label>Choose your country</label>
+                  </div>
+                    <div class="input-field">
+                      <select name="category" id="category">
+                        <option value="general">General</option>
+                        <option value="health">Health</option>
+                        <option value="science">Science</option>
+                        <option value="sports">Sports</option>
+                        <option value="technology">Technology</option>
+                        <option value="business">Business</option>
+                        <option value="entertainment">Entertainment</option>
+                      </select>
+                      <label>Choose an interesting category</label>
+                    </div>
+
+                  <div class="input-field">
+                    <input
+                      type="text"
+                      id="autocomplete-input"
+                      class="autocomplete"
+                      name="search"
+                    />
+                    <label for="autocomplete-input">Search</label>
+                  </div>
+                </div>
+                <div class="card-action">
+                  <button
+                    class="btn waves-effect waves-light"
+                    type="submit"
+                    name="action"
+                  >
+                    Search
+                    <i class="material-icons right">search</i>
                   </button>
-                </form>
-              </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="tasks-list-section mt-5">
+    <div class="news-container">
       <div class="container">
-        <ul class="list-group"></ul>
+        <div class="row grid-container"></div>
       </div>
     </div>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
+
+

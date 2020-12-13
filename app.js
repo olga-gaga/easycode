@@ -1,178 +1,199 @@
+//17fc59ad163c4ff0a2295b0980428f40
+// Custom Http Module
 function customHttp() {
-    return {
-        get(url, callback) {
-            try{
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', url);
-                xhr.addEventListener('load', () => {
-                    if(Math.floor(xhr.status/100) !== 2) {
-                        callback(`Error code status: ${xhr.status}`, xhr);
-                        return;
-                    }
-                    const response = JSON.parse(xhr.responseText);
-                    console.log(response);
-                    callback(null, response);
-                });
+  return {
+    get(url, cb) {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.addEventListener('load', () => {
+          if (Math.floor(xhr.status / 100) !== 2)    {
+            cb(`Error. Status code: ${xhr.status}`, xhr);
+            return;
+          }
+          const response = JSON.parse(xhr.responseText);
+          cb(null, response);
+        });
 
-                xhr.addEventListener('error', () => {
-                    callback(`Error code status: ${xhr.status}`, xhr);
-                });
-                xhr.send();
-            } catch (error) {
-                callback(error);
-            }
-        },
-        post(url, body, headers, callback){
-            try{
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', url);
-                xhr.addEventListener('load', () => {
-                    if(Math.floor(xhr.status/100) !== 2) {
-                        callback(`Error code status: ${xhr.status}`, xhr);
-                        return;
-                    }
-                    const response = JSON.parse(xhr.responseText);
-                    callback(null, response);
-                    console.log(response);
-                });
+        xhr.addEventListener('error', () => {
+          cb(`Error. Status code: ${xhr.status}`, xhr);
+        });
 
-                xhr.addEventListener('error', () => {
-                    callback(`Error code status: ${xhr.status}`, xhr);
-                });
+        xhr.send();
+      } catch (error) {
+        cb(error);
+      }
+    },
+    post(url, body, headers, cb) {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url);
+        xhr.addEventListener('load', () => {
+          if (Math.floor(xhr.status / 100) !== 2) {
+            cb(`Error. Status code: ${xhr.status}`, xhr);
+            return;
+          }
+          const response = JSON.parse(xhr.responseText);
+          cb(null, response);
+        });
 
-                if (headers) {
-                    Object.entries(headers).forEach( ([key, value]) => {
-                        xhr.setRequestHeader(key, value);
-                    })
-                }
-                xhr.send(JSON.stringify(body));
-            } catch (error) {
-                callback(error);
-            }
+        xhr.addEventListener('error', () => {
+          cb(`Error. Status code: ${xhr.status}`, xhr);
+        });
+
+        if (headers) {
+          Object.entries(headers).forEach(([key, value]) => {
+            xhr.setRequestHeader(key, value);
+          });
         }
-    };
-}
 
+        xhr.send(JSON.stringify(body));
+      } catch (error) {
+        cb(error);
+      }
+    },
+  };
+}
+// Init http module
 const http = customHttp();
 
-// Elements
-const container = document.querySelector('.container');
-const form = document.forms['newUser'];
 
-// Get users list
-http.get('https://jsonplaceholder.typicode.com/users', onGetResponse);
+const newsService = (function(){
+  const apiKey = '17fc59ad163c4ff0a2295b0980428f40';
+  const apiUrl = 'https://news-api-v2.herokuapp.com';
+  return {
+    topHeadlines(country = 'ua', category = '', callback){
+      http.get(`${apiUrl}/top-headlines?category=${category}&country=${country}&apiKey=${apiKey}`, callback);
+    },
+    everything(query, callback){
+      http.get(`${apiUrl}/everything?q=${query}&apiKey=${apiKey}`, callback)
+    }
+  };
+})();
 
-// Events
-container.addEventListener('click', onUserCardHandler);
-form.addEventListener('submit', onFormSubmit);
+//Elements
+const newsContainer = document.querySelector('.news-container .row');
+const form = document.forms['newsControls'];
+const countrySelect = form.elements['country'];
+const categorySelect = form.elements['category'];
+const searchInput = form.elements['search'];
 
-function postNewUser(){
-    const body = createRequestBody(form);
-    http.post('https://jsonplaceholder.typicode.com/users', body, {'Content-type': 'application/json; charset=UTF-8'}, renderUser);
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  loadNews();
+});
+
+//  init selects
+document.addEventListener('DOMContentLoaded', function() {
+  M.AutoInit();
+  loadNews();
+});
+
+
+// Load news function
+function loadNews(){
+  showLoader();
+  const { country, category, searchText } = getFormInput();
+  if(!searchText) {
+    newsService.topHeadlines(country, category, onGetResponse);
+  } else{
+    newsService.everything(searchText, onGetResponse);
+  }
 }
 
-function createRequestBody(form){
-    return {
-        id: 1,
-        name: form.elements['inputName'].value,
-        email: form.elements['inputEmail'].value,
-        username: form.elements['inputUsername'].value,
-        phone: form.elements['inputPhone'].value,
-        website: form.elements['inputWebsite'].value,
-    };
+function getFormInput(){
+  return {
+    country: countrySelect.value,
+    category: categorySelect.value,
+    searchText: searchInput.value,
+  }
 }
 
-function onFormSubmit(e){
-    e.preventDefault();
-    postNewUser();
-    form.reset();
-}
-
+// function on get response from server
 function onGetResponse(error, response) {
-    if (error) {
-        console.log(error, response);
-        return;
-    }
-    if (response.length) {
-        sessionStorage.setItem('users', JSON.stringify(response));
-        renderUsers(response);
-        console.log(response);
-    }  
+  removePreLoader();
+  clearContainer(newsContainer);
+
+  if (error) {
+    showAlert(error,'error-msg');
+    return;
+  }
+  //show empty message
+  if (!response.articles.length){
+    newsContainer.insertAdjacentHTML('afterbegin', emptyMessageTemplate());
+    return;
+  }
+  renderNew(response.articles);
 }
 
-function renderUser(error, user) {
-    container.insertAdjacentHTML('afterbegin', createUserCard(user));
-    createUserField(user);
+function renderNew(news) {
+  let fragment = '';
+  news.forEach(newsItem => {
+    const el = newsTemplate(newsItem);
+    fragment += el;
+  });
+  newsContainer.insertAdjacentHTML('afterbegin', fragment);
 }
 
-function createUserField(user) {
-   const users = JSON.parse(sessionStorage.getItem('users'));
-   users[users.length] = user;
-   sessionStorage.setItem('users', JSON.stringify(users));
+function clearContainer(container) {
+  let child = container.lastElementChild;
+  while (child) {
+    container.removeChild(child);
+    child = container.lastElementChild;
+  }
 }
 
-function renderUsers(usersList){
-    let fragment = '';
-    usersList.forEach(user => fragment += createUserCard(user));
-    container.insertAdjacentHTML('afterbegin', fragment);
-}
-
-function createUserCard({id, name}){
-    return `
-        <div class="card mx-auto my-3 bg-light"> 
-            <div class="card-body">
-                <h5 class="card-title" data-id="${id}"> ${name} </h5>
-            </div>
-        </div>`;
-}
-
-function onUserCardHandler({target}){
-    if (target.classList.contains('card-title')){
-        const parent = target.closest('.card-body');
-        const id = parseInt(target.dataset.id);
-        checkUserInfo(parent,id);
-    }
-}
-
-function checkUserInfo(parent, id) {
-    if(parent.querySelector('.info-part')) {
-        removeElement(parent, '.info-part');
-        return;
-    }
-    renderUserInfo(parent, id);
-}
-
-function getUser(id) {
-    return JSON.parse(sessionStorage.getItem('users'))[id - 1];
-} 
-
-function renderUserInfo(parentNode, userId) {
-    const user = getUser(userId);
-    if(!user) return;
-    const infoPart = createInformationPart(user);
-    parentNode.insertAdjacentHTML('beforeend', infoPart); 
-}
-
-function createInformationPart({username, email, phone, website, company: {name:companyName} = {}} = {}){
-    return `
-        <div class='info-part'>
-            ${createInfoItemTemplate('Username', username)}
-            ${createInfoItemTemplate('Email', email)}
-            ${createInfoItemTemplate('Phone', phone)}
-            ${createInfoItemTemplate('Company', companyName)}
-            ${createInfoItemTemplate('Website', website)}
+// News item template function 
+function newsTemplate({urlToImage, title, url, description}){
+  return `
+    <div class="col s12">
+      <div class="card"> 
+        <div class="card-image">
+          <img src="${urlToImage || 'no_image.png'}"/>
+          <span class="card-title"> ${title || ''} </span>
+        </div>  
+        <div class="card-content">
+          <p>${description || ''}</p>
         </div>
-    `;
+        <div class="card-action">
+          <a href="${url}">Read more </a>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
-function createInfoItemTemplate(name, info){
- if (info) {
-     return `<p class="card-text"><span class='info-item'>${name}:</span> ${info}</p>`
- }
- return '';
+function emptyMessageTemplate(){
+  return `
+  <div class="col s12 bold">
+    <div class="card"> 
+      <div class="card-content">
+        <p> К сожалению, по вашему запросу ничего не найдено. Попробуйте изменить поисковый запрос :)</p>
+      </div>
+    </div>
+  </div>
+`;
 }
 
-function removeElement(parent, nodeClass) {
-    const node = parent.querySelector(nodeClass);
-    node.remove();
+
+
+function showAlert(message, type = 'success') {
+  M.toast({html: message, classes:type});
 }
+
+function showLoader(){
+  document.body.insertAdjacentHTML(
+    'afterbegin', 
+    `<div class="progress">
+      <div class="indeterminate"></div>
+    </div>`);
+}
+
+function removePreLoader() {
+  const loader = document.querySelector('.progress');
+  if (loader) {
+    loader.remove();
+  }
+}
+

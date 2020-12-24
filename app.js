@@ -3,8 +3,7 @@ function customHttp () {
   return {
       async get(url) {
           try{
-              response = await fetch(url).then(res => res.json());
-              return response;
+              return await fetch(url).then(res => res.json());
           }
           catch(error) {
               return Promise.reject(error);
@@ -17,8 +16,8 @@ function customHttp () {
                   headers: headers,
                   body: JSON.stringify(body),
               }
-              const response = await fetch(url, init).then(res => res.json());
-              return response;
+              
+              return await fetch(url, init).then(res => res.json());
           }
           catch (error) {
               return Promise.reject(error);

@@ -1,154 +1,183 @@
 //task 1
 console.log('task 1');
 
-(function (){
-
-    const map = ["_id", "name", "isActive", "balance"];
-
-    const users = [
-    {
-        "_id": "5d220b10e8265cc978e2586b",
-        "isActive": true,
-        "balance": 2853.33,
-        "age": 20,
-        "name": "Buckner Osborne",
-        "gender": "male",
-        "company": "EMPIRICA",
-        "email": "bucknerosborne@empirica.com",
-        "phone": "+1 (850) 411-2997",
-        "registered": "2018-08-13T04:28:45 -03:00"
-    },
-    {
-        "_id": "5d220b10144ef972f6c2b332",
-        "isActive": true,
-        "balance": 1464.63,
-        "age": 38,
-        "name": "Rosalie Smith",
-        "gender": "female",
-        "company": "KATAKANA",
-        "email": "rosaliesmith@katakana.com",
-        "phone": "+1 (943) 463-2496",
-        "registered": "2016-12-09T05:15:34 -02:00"
-    },
-    {
-        "_id": "5d220b1083a0494655cdecf6",
-        "isActive": false,
-        "balance": 2823.39,
-        "age": 40,
-        "name": "Estrada Davenport",
-        "gender": "male",
-        "company": "EBIDCO",
-        "email": "estradadavenport@ebidco.com",
-        "phone": "+1 (890) 461-2088",
-        "registered": "2016-03-04T03:36:38 -02:00"
+(function(){
+    function Planet(name) {
+        this.name = name;
+        this.getName = function () {
+            return 'Planet name is ' + this.name;
+        }
     }
-    ];
-
-    const mapUsers = users.map(user => 
-        map.reduce((acc, key) => {
-            if (Object.keys(user).indexOf(key) !== -1) {
-                acc[key] = user[key];
-            }
-            return acc;
-        }, {}));
-
-    console.log(mapUsers);
-
+    
+    function PlanetWithSatellite(name, satellite){
+        Planet.call(this, name);
+        this.satellite = satellite;
+    
+        this.parentGetName = this.getName;
+        
+        this.getName = function(){
+            return `${this.parentGetName.call(this)}. The satellite is ${this.satellite}.`;
+        }
+    }
+    
+    let earth = new PlanetWithSatellite('Earth', 'Moon');
+    console.log(earth.getName());
 })();
+
 //task 2
 console.log('task 2');
+(function(){
 
-(function() {
+    function Building(name, numberFloors) {
 
-    const charWithIndex = [{char:"a",index:12}, {char:"w",index:8}, {char:"Y",index:10}, {char:"p",index:3}, {char:"p",index:2}, {char:"N",index:6}, {char:" ",index:5}, {char:"y",index:4}, {char:"r",index:13}, {char:"H",index:0}, {char:"e",index:11}, {char:"a",index:1}, {char:" ",index:9}, {char:"!",index:14}, {char:"e",index:7}];
+        this.name = name;
+        this.numberFloors = numberFloors;
 
-    function createStr(arrayOfChars){
-        if(Array.isArray(arrayOfChars)){
-            return [...arrayOfChars]
-                .sort((prevIndex, nextIndex) => prevIndex.index - nextIndex.index)
-                .reduce((acc, char) => (acc += char.char), '');
+        this.getNumberFloors = function () {
+            return this.numberFloors;
         }
-        else console.log('Ошибочное значение');
+
+        this.setNumberFloors = function (newNumberFloors) {
+            this.numberFloors = newNumberFloors;
+        }
+
     }
 
-    const resultStr = createStr(charWithIndex);
+    function House (name, numberFloors, numberApartmentsPerFloor) {
+        Building.call(this, name, numberFloors);
 
-    console.log(resultStr);
+        this.numberApartmentsPerFloor = numberApartmentsPerFloor;
+        this.parentGetNumberFloors = this.getNumberFloors;
 
+        this.getNumberFloors = function () {
+            const floors = this.parentGetNumberFloors.call(this);
+            return {
+                floors: floors,
+                totalApartments: floors * this.numberApartmentsPerFloor,
+            }
+        }
+
+    }
+
+    function ShoppingCenter (name, numberFloors, numberShopsPerFloor) {
+        Building.call(this, name, numberFloors);
+
+        this.numberShopsPerFloor = numberShopsPerFloor;
+
+        this.parentGetNumberFloors = this.getNumberFloors;
+
+        this.getNumberFloors = function () {
+            const floors = this.parentGetNumberFloors();
+
+            return {
+                floors: floors,
+                totalStores: floors * this.numberShopsPerFloor,
+            }
+        }
+    }
+
+    const someHouse = new House('Some House', 12, 5);
+    console.log(someHouse.getNumberFloors());
+
+    const someShopingCenter = new ShoppingCenter ('Diamond City', 17, 10);
+    console.log(someShopingCenter.getNumberFloors());
 })();
 
 //task 3
 console.log('task 3');
 
-(function() {
-    
-    function getInfo ({name = 'Unknown', info: {partners: [partner1, partner2] = []} = {}} = {}){
-        console.log(`Name: ${name} \nPartners: ${partner1}, ${partner2}`);
+(function () {
+
+    function Furniture (name, price) {
+        this.name = name;
+        this.price = price; 
     }
 
-    const organisation = { 
-        name: 'Google', 
-        info: { 
-          employees: ['Vlad', 'Olga'], 
-          partners: ['Microsoft', 'Facebook', 'Xing'] 
-      } };
+    Furniture.prototype.getInfo = function () {
+       return `Furniture. Name: ${this.name}, price: ${this.price}`;
+    }
 
-    getInfo(organisation);
+    const officeFurniture = new Furniture('Office table Techo+', 500);
+    officeFurniture.cabinet = 'conference hall';
+
+    officeFurniture.getInfo = function(){
+        return `${Furniture.prototype.getInfo.call(this)}, cabinet: ${this.cabinet}`
+    }
+
+    console.log(officeFurniture.getInfo());
+
+    const homeFurniture = new Furniture('Sofa Claudia', 300);
+    homeFurniture.room = 'living room';
+
+    homeFurniture.getInfo = function() {
+        return `${Furniture.prototype.getInfo.call(this)}, room: ${this.room}`;
+    }
+
+    console.log(homeFurniture.getInfo());
 
 })();
+
 
 //task 4
 console.log('task 4');
 
-(function() {  
-
-    const person = {
-        name: 'Denis',
-        age: 30,
-        lastGet: '',
-        lastUpdate: '', 
-        get nameField(){
-            this.lastGet = Date(Date.now());
-            console.log(this.name);
-        }, 
-        set nameField (newName) {
-            this.lastUpdate = Date(Date.now());
-            if(typeof newName === 'string') this.name = newName;
-            else console.log('Ошибочное значение');
-        }
-    };
-    console.log(person);
-    person.nameField;
-    console.log(person);
-    person.nameField = 'Olga';
-    console.log(person);
-})();
-
-//task 5
-console.log('task 5');
-
 (function() {
+
+    const week = 7*24*60*60*1000;
     
-    const product = {
-        brand: 'Apple',
-        model: 'iPhone 7',
-        price: '$300', 
-        get info() {
-            return `${this.brand} ${this.model}`;
-        },
-        set info(value) {
-            if(typeof value === 'string') {
-                [this.brand, ...model] = value.split(' ');
-                this.model = model.join(' ');
-            }
-            else console.log('Ошибочное значение');
-        },
-    };
-    console.log(product);
-    console.log(product.info);
-    product.info = 'Samsung S8 Gold';
-    console.log(product);
-    console.log(product.info);
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday:'short',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric', 
+    }
+
+    function User (name, registrationDate) {
+        this.name = name;
+        this.registrationDate = new Date(registrationDate);
+    }
+
+    User.prototype.getInfo = function() {
+        return `Name: ${this.name}\nRegistration date: ${this.registrationDate.toLocaleString('ru', options)}`;
+    }
+
+    function Admin(name, registrationDate, superAdmin) {
+        User.call(this, name, registrationDate);
+        this._superAdmin = superAdmin || false;
+
+        this.getSuperAdmin = function () {
+            return this._superAdmin;
+        }
+    }
+
+    function Guest(name, registrationDate) {
+        User.call(this, name, registrationDate);
+        this.validDate = new Date(this.registrationDate.getTime() + week);
+    }
+
+    Admin.prototype = Object.create(User.prototype);
+    Admin.constructor = Admin;
+
+    Guest.prototype = Object.create(User.prototype);
+    Guest.constructor = Guest;
+
+
+    Admin.prototype.getInfo = function() {
+        return `${User.prototype.getInfo.call(this)}\nSuperadmin: ${this.getSuperAdmin()}`;
+    }
+
+    Guest.prototype.getInfo = function() {
+        return `${User.prototype.getInfo.call(this)}\nValidation date: ${this.validDate.toLocaleString('ru', options)}`;
+    }
+
+    const someAdmin = new Admin('Vova', '2020-10-30', true);
+
+    console.log(someAdmin.getInfo());
+
+    const someGuest = new Guest('Yuriy', '2020-12-10');
+    console.log (someGuest.getInfo());
 
 })();
-
